@@ -275,7 +275,7 @@ Object.keys(testContexts).forEach((testKey) => {
       });
 
       context('state with empty key', () => {
-        const emptyReducer = function () { return {}; };
+        const emptyReducer = function emptyReducer() { return {}; };
         const store = createStore(combineReducers({
           '': emptyReducer,
           firstForm: formReducer('first'),

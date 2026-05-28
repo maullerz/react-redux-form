@@ -396,6 +396,26 @@ function createControlClass(s) {
       return this.props.getValue(event, this.props);
     }
 
+    getControlRef(userGetRef) {
+      return (node) => {
+        this.attachNode(node);
+        if (userGetRef) {
+          userGetRef(node);
+        }
+      };
+    }
+
+    attachNode(node) {
+      if (!node) {
+        this.node = null;
+        this.willValidate = false;
+        return;
+      }
+
+      this.node = node;
+      this.willValidate = node.willValidate;
+    }
+
     /* eslint-disable camelcase */
     UNSAFE_componentWillReceiveProps({ modelValue }) {
       if (modelValue !== this.props.modelValue) {
@@ -601,26 +621,6 @@ function createControlClass(s) {
           (e) => this.getValue(e),
           persistEventWithCallback(controlEventHandler || identity)
         )(event, withField ? fieldValue : undefined);
-      };
-    }
-
-    attachNode(node) {
-      if (!node) {
-        this.node = null;
-        this.willValidate = false;
-        return;
-      }
-
-      this.node = node;
-      this.willValidate = node.willValidate;
-    }
-
-    getControlRef(userGetRef) {
-      return (node) => {
-        this.attachNode(node);
-        if (userGetRef) {
-          userGetRef(node);
-        }
       };
     }
 
