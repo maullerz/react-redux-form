@@ -2275,19 +2275,20 @@ Object.keys(testContexts).forEach((testKey) => {
 
         const onOuterSubmit = sinon.spy();
         const onInnerSubmit = sinon.spy();
+        const portalContainer = document.createElement('div');
 
-        const form = TestUtils.renderIntoDocument(
+        TestUtils.renderIntoDocument(
           <Provider store={store}>
             <Form model="test" onSubmit={onOuterSubmit}>
               {createPortal(
                 <Form model="test" className="inner-form" onSubmit={onInnerSubmit} />,
-                document.createElement('div'),
+                portalContainer,
               )}
             </Form>
           </Provider>
         );
 
-        const formElement = TestUtils.findRenderedDOMComponentWithClass(form, 'inner-form');
+        const formElement = portalContainer.querySelector('.inner-form');
 
         TestUtils.Simulate.submit(formElement);
 

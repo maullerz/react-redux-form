@@ -425,7 +425,7 @@ function createFormClass(s = defaultStrategy) {
     };
   }
 
-  return connect(mapStateToProps)(Form);
+  return connect(mapStateToProps, null, null, { forwardRef: true })(Form);
 }
 
 export {

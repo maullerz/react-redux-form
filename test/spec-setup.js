@@ -2,6 +2,8 @@ import jsdom from 'jsdom';
 import chai from 'chai';
 import chaiSubset from 'chai-subset';
 
+import './helpers/patch-react-18-test-utils';
+
 chai.use(chaiSubset);
 
 global.document = jsdom.jsdom('<!doctype html><html><body></body></html>');

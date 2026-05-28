@@ -374,20 +374,29 @@ Object.keys(testContexts).forEach((testKey) => {
             </Provider>
           );
 
-          const [radioOne, radioTwo] = TestUtils.scryRenderedDOMComponentsWithTag(field, 'input');
+          function getRadios() {
+            const inputs = TestUtils.scryRenderedDOMComponentsWithTag(field, 'input');
+            return [
+              inputs.find((input) => input.value === 'one'),
+              inputs.find((input) => input.value === 'two'),
+            ];
+          }
 
           it('should initially set the radio button matching the initial state to checked', () => {
+            const [radioOne, radioTwo] = getRadios();
             assert.equal(radioTwo.checked, true);
             assert.equal(radioOne.checked, false);
           });
 
           it('should give each radio input a name attribute of the model', () => {
+            const [radioOne, radioTwo] = getRadios();
             assert.equal(radioOne.name, 'test.foo');
             assert.equal(radioTwo.name, 'test.foo');
           });
 
 
           it('should dispatch a change event when changed', () => {
+            const [radioOne, radioTwo] = getRadios();
             TestUtils.Simulate.change(radioOne);
 
             assert.equal(
@@ -402,18 +411,22 @@ Object.keys(testContexts).forEach((testKey) => {
           });
 
           it('should check the appropriate radio button when model is externally changed', () => {
+            let [radioOne, radioTwo] = getRadios();
             store.dispatch(actions.change('test.foo', 'one'));
+            [radioOne, radioTwo] = getRadios();
 
             assert.equal(radioOne.checked, true);
             assert.equal(radioTwo.checked, false);
 
             store.dispatch(actions.change('test.foo', 'two'));
+            [radioOne, radioTwo] = getRadios();
 
             assert.equal(radioTwo.checked, true);
             assert.equal(radioOne.checked, false);
           });
 
           it('should uncheck all radio buttons that are not equal to the value', () => {
+            const [radioOne, radioTwo] = getRadios();
             store.dispatch(actions.change('test.foo', 'three'));
 
             assert.equal(radioOne.checked, false);
