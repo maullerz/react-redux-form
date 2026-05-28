@@ -6,7 +6,13 @@ chai.use(chaiSubset);
 
 global.document = jsdom.jsdom('<!doctype html><html><body></body></html>');
 global.window = document.defaultView;
-global.navigator = { userAgent: 'node.js' };
-global.requestAnimationFrame = () => {
-  throw new Error('requestAnimationFrame is not supported in Node');
-};
+
+// Node 21+ / babel-register: `global.navigator = …` throws (read-only getter).
+Object.defineProperty(global, 'navigator', {
+  value: global.window.navigator,
+  writable: true,
+  configurable: true,
+});
+
+global.requestAnimationFrame = global.window.requestAnimationFrame
+  || ((callback) => setTimeout(() => callback(Date.now()), 0));
