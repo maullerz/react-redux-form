@@ -17,7 +17,6 @@ import getForm, { getFormStateKey } from './utils/get-form';
 import isPlainObject from './utils/is-plain-object';
 import immutableFindKey from './utils/find-key-immutable';
 import Immutable from 'immutable';
-import { findDOMNode } from 'react-dom';
 
 import {
   initialFieldState,
@@ -122,7 +121,6 @@ const ImmutableControl = createControlClass({
   get: immutableGetFromState,
   getFieldFromState: immutableGetFieldFromState,
   actions: immutableModelActions,
-  findDOMNode,
 });
 const ImmutableField = createFieldClass(controlPropsMap, {
   Control: ImmutableControl,

@@ -31,6 +31,20 @@ import ComponentWrapper from './control-strip-defaults-component';
 
 const disallowedProps = ['changeAction', 'getFieldFromState', 'store'];
 
+function mergeRefs(...refs) {
+  return (node) => {
+    refs.forEach((ref) => {
+      if (!ref) return;
+      if (typeof ref === 'function') {
+        ref(node);
+      } else if (typeof ref === 'object') {
+        // eslint-disable-next-line no-param-reassign
+        ref.current = node;
+      }
+    });
+  };
+}
+
 function mergeOrSetErrors(model, errors, options) {
   return actions.setErrors(model, errors, {
     merge: isObjectLike(errors),
@@ -135,6 +149,7 @@ function createControlClass(s) {
       this.getMappedProps = this.getMappedProps.bind(this);
       this.getRenderProps = this.getRenderProps.bind(this);
       this.attachNode = this.attachNode.bind(this);
+      this.getControlRef = this.getControlRef.bind(this);
 
       if (props.debounce) {
         this.handleUpdate = debounce(this.handleUpdate, props.debounce);
@@ -153,7 +168,6 @@ function createControlClass(s) {
     }
 
     componentDidMount() {
-      this.attachNode();
       this.handleLoad();
     }
 
@@ -590,13 +604,24 @@ function createControlClass(s) {
       };
     }
 
-    attachNode() {
-      const node = s.findDOMNode && s.findDOMNode(this);
-
-      if (node) {
-        this.node = node;
-        this.willValidate = node.willValidate;
+    attachNode(node) {
+      if (!node) {
+        this.node = null;
+        this.willValidate = false;
+        return;
       }
+
+      this.node = node;
+      this.willValidate = node.willValidate;
+    }
+
+    getControlRef(userGetRef) {
+      return (node) => {
+        this.attachNode(node);
+        if (userGetRef) {
+          userGetRef(node);
+        }
+      };
     }
 
     validate(options) {
@@ -648,22 +673,23 @@ function createControlClass(s) {
 
       const mappedProps = omit(this.getMappedProps(), disallowedProps);
 
-      if (getRef) {
-        mappedProps.getRef = getRef;
-      }
-
       if (controlProps.withFieldValue) {
         mappedProps.fieldValue = fieldValue;
       }
 
       // If there is an existing control, clone it
       if (control) {
+        const userGetRef = getRef || control.props.getRef;
+        const { ref: mappedRef, getRef: mappedGetRef, ...restMappedProps } = mappedProps;
+
         return cloneElement(
           control,
           {
-            ...mappedProps,
+            ...restMappedProps,
             defaultValue: undefined,
             defaultChecked: undefined,
+            getRef: this.getControlRef(userGetRef || mappedGetRef),
+            ref: mergeRefs(mappedRef, control.ref),
           },
           controlProps.children
         );
@@ -674,6 +700,7 @@ function createControlClass(s) {
           component,
           ...controlProps,
           ...mappedProps,
+          getRef: this.getControlRef(getRef),
         }
       );
     }

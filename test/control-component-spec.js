@@ -13,6 +13,7 @@ import i from 'icepick';
 import Immutable from 'immutable';
 
 import { testCreateStore, testRender } from './utils';
+import { assertIsSyntheticEvent } from './helpers/assert-synthetic-event';
 
 import {
   controls as _controls,
@@ -1903,10 +1904,7 @@ Object.keys(testContexts).forEach((testKey) => {
         TestUtils.Simulate.change(control);
 
         assert.isTrue(onChangeFnSpy.calledOnce);
-        assert.isObject(onChangeFnSpy.returnValues[0]);
-        assert.equal(
-          onChangeFnSpy.returnValues[0].constructor.name,
-          'SyntheticEvent');
+        assertIsSyntheticEvent(assert, onChangeFnSpy.returnValues[0]);
         assert.equal(
           onChangeFnSpy.returnValues[0].target.value,
           'testing');
@@ -2029,10 +2027,7 @@ Object.keys(testContexts).forEach((testKey) => {
           TestUtils.Simulate[event](control);
 
           assert.isTrue(onEventSpy.calledOnce);
-          assert.isObject(onEventSpy.returnValues[0]);
-          assert.equal(
-            onEventSpy.returnValues[0].constructor.name,
-            'SyntheticEvent');
+          assertIsSyntheticEvent(assert, onEventSpy.returnValues[0]);
 
           assert.equal(targetValue, `testing ${event}`);
         });
