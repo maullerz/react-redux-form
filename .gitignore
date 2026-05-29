@@ -47,3 +47,4 @@ examples/sandbox
 # Other
 .vscode/
 .idea/
+.DS_Store
