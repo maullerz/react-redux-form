@@ -41,14 +41,23 @@ Upstream по сути **не поддерживается**; форк — ра�
 "dependencies": {
   "icepick": "^1.1.0",
   "invariant": "~2.2.1",
-  "lodash.get": "~4.4.2",
-  "lodash.topath": "~4.5.2",
+  "lodash-es": "^4.18.1",
   "prop-types": "^15.5.6",
   "shallow-compare": "^1.2.1"
 }
 ```
 
-Сборка: **Babel 6** → `lib/` (не в Git), UMD → `umd/ReactReduxForm.min.js`.
+Сборка: **Babel 6** (`modules: false`) → **`lib/` ESM** (не в Git); `prepare` = только `build:lib`.
+
+### Lodash: `dependencies` vs `devDependencies`
+
+| Пакет | Где | Зачем |
+|-------|-----|--------|
+| **`lodash-es`** | только **`dependencies`** | `src/utils/get.js`, `to-path.js`, `path-starts-with.js` → в собранном `lib/` импорты `lodash-es/get`, `lodash-es/toPath`. В СББОЛ резолвится из `lodash-es` клиента. |
+| **`lodash.get`**, **`lodash.topath`** | только **`devDependencies`** | Старые импорты в **`test/*`** (`utils.js`, `field-component-spec.js`, …). Нужны для `npm test`, **не** попадают в `lib/` и не нужны потребителю пакета. |
+| **`lodash-es` в `devDependencies`** | **не дублировать** | Достаточно одной записи в `dependencies`; в devDependencies `lodash-es` лишний. |
+
+Опционально позже: перевести тесты на `lodash-es` и убрать `lodash.get` / `lodash.topath` из devDependencies полностью.
 
 ## Совместимость со стеком СББОЛ (dbo-front-copy)
 

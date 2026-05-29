@@ -2,11 +2,14 @@
   "name": "react-redux-form",
   "version": "1.16.14",
   "description": "Create Forms Easily with React and Redux",
-  "main": "lib/index.js",
+  "main": "./lib/index.js",
+  "exports": {
+    ".": "./lib/index.js"
+  },
   "typings": "react-redux-form.d.ts",
   "scripts": {
     "start": "npm run build",
-    "prepare": "npm run build:umd && npm run build:lib",
+    "prepare": "npm run build:lib",
     "examples": "NODE_ENV=development node examples/server.js",
     "lint": "eslint --ext .js,.jsx .",
     "lint:fix": "eslint --fix --ext .js,.jsx .",
@@ -72,6 +75,8 @@
     "immutable": "^3.7.6",
     "jsdom": "^9.2.1",
     "lodash": "~4.17.2",
+    "lodash.get": "~4.4.2",
+    "lodash.topath": "~4.5.2",
     "mocha": "^2.5.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -91,8 +96,7 @@
   "dependencies": {
     "icepick": "^1.1.0",
     "invariant": "~2.2.1",
-    "lodash.get": "~4.4.2",
-    "lodash.topath": "~4.5.2",
+    "lodash-es": "^4.18.1",
     "prop-types": "^15.5.6",
     "shallow-compare": "^1.2.1"
   },

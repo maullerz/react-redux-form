@@ -12,11 +12,12 @@
 
 ### Vendor в репозитории клиента (без package.json в vendor)
 
-1. `vendor/react-redux-form/lib/` — результат `npm run build:lib` в форке; `react-redux-form.d.ts`, `LICENSE`, `README.md` (commit SHA).
-2. В `configs/rspack.base.js`: `react-redux-form$` → `lib/index.js`, `react-redux-form/src` → `lib` (для редких импортов вида `react-redux-form/src/...`).
-3. В `tsconfig.json` `paths`: `react-redux-form` → `.d.ts`, `react-redux-form/src/*` → `lib/*`.
-4. Runtime-deps форка в **корневом** `package.json` клиента: `icepick`, `invariant`, `shallow-compare` (`lodash.get` / `lodash.topath` — alias на `lodash-es` в rspack).
+1. `vendor/react-redux-form/lib/` — **ESM** (`babel` с `modules: false`), результат `npm run build:lib`; `react-redux-form.d.ts`, `LICENSE`, `README.md` (commit SHA).
+2. В `configs/rspack.base.js`: `react-redux-form$` → `vendor/.../lib/index.js` (без alias `react-redux-form/src`).
+3. В `tsconfig.json` `paths`: `react-redux-form` → `react-redux-form.d.ts`.
+4. Runtime-deps форка в **корневом** `package.json` клиента: `icepick`, `invariant`, `shallow-compare` (+ `prop-types`; `lodash-es` резолвится из клиента для импортов в `lib/`).
 5. Зависимость `react-redux-form` из `package.json` клиента **удалена** — Jenkins/Nexus не ходят в GitHub.
+6. Публичные импорты только с корня: `import { actions, Form, initialFieldState } from 'react-redux-form'` (без deep-import внутренних путей).
 
 ### Git (исторический)
 
@@ -44,11 +45,10 @@ git+ssh://git@github.com/maullerz/react-redux-form.git#84f1669625b0b66688e134840
 2. В каталоге пакета выполняется скрипт **`prepare`** из [package.json](../package.json):
 
    ```json
-   "prepare": "npm run build:umd && npm run build:lib"
+   "prepare": "npm run build:lib"
    ```
 
-3. Babel собирает `src/` → **`lib/`** (точка входа `"main": "lib/index.js"`).
-4. Webpack собирает **`umd/ReactReduxForm.min.js`**.
+3. Babel собирает `src/` → **`lib/`** (ESM, `"main": "./lib/index.js"`).
 
 Каталоги **`lib/`** и **`umd/`** в Git **не коммитятся** (см. [.gitignore](../.gitignore)) — это нормально. Без успешного `prepare` клиент получит пакет без `lib/index.js` и сборка упадёт.
 
@@ -70,6 +70,19 @@ npm ls react-redux-form
 | redux | 4.0.5 | ^3 \|\| ^4 |
 
 `npm install` в клиенте **без** `--legacy-peer-deps` проходит при корректном lockfile.
+
+## Lodash в `package.json` форка (не путать с клиентом)
+
+В репозитории **форка**, не в `dbo-front-copy`:
+
+| Пакет | `dependencies` | `devDependencies` |
+|-------|----------------|---------------------|
+| `lodash-es` | **да** — runtime `lib/` | **нет** (дубликат не нужен) |
+| `lodash.get`, `lodash.topath` | **нет** | **да** — только для `test/*`, пока тесты не переведены на `lodash-es` |
+
+В **СББОЛ** отдельно ставить `lodash.get` / `lodash.topath` не нужно: в vendored `lib/` уже `import … from 'lodash-es/…'`, бандлер берёт `lodash-es` из корневого `package.json` клиента.
+
+Подробнее: [01-fork-lineage.md](./01-fork-lineage.md) — раздел «Lodash: dependencies vs devDependencies».
 
 ## Почему не `file:` и не коммит `lib/` в форк
 

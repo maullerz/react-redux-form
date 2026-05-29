@@ -12,8 +12,9 @@ npm test
 | Параметр | Значение |
 |----------|----------|
 | Раннер | Mocha **2.5** |
-| Транспиляция | `babel-register` + `.babelrc` (Babel 6) |
+| Транспиляция | `babel-register` + `.babelrc` (Babel 6); для `NODE_ENV=test` — preset `modules: commonjs` (см. `env.test` в `.babelrc`) |
 | DOM | jsdom **9** (`test/spec-setup.js`) |
+| Lodash в тестах | `lodash.get`, `lodash.topath` в **devDependencies** форка — импорты в `test/*`, не в `lib/` |
 | Рекомендуемый Node | `>=18.11` (`package.json` `engines`), в Volta: **22.18.0** |
 
 Ожидаемый результат после настройки окружения:

@@ -1,4 +1,4 @@
-import _toPath from 'lodash.topath';
+import _toPath from 'lodash-es/toPath';
 import endsWith from './ends-with';
 
 export default function toPath(value) {

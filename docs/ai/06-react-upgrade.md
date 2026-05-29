@@ -99,19 +99,23 @@ HTML5 validation (`willValidate`) по-прежнему использует `th
 - [x] `Form` forwardRef
 - [x] assert SyntheticBaseEvent
 
-### СББОЛ — сделано (2026-05-29)
+### СББОЛ — vendor ESM (актуально)
 
-- [x] Git pin `github:maullerz/react-redux-form#84f1669`
-- [x] `prepare` → `lib/`, без nested `node_modules` у пакета
-- [x] `npm run rspack:prod`
-- [x] Ручной прогон UI — без замечаний
+- [x] Vendor `vendor/react-redux-form/lib` — **ESM** (`build:lib`, `modules: false`)
+- [x] `prepare` = только `build:lib`; runtime lodash через `lodash-es` в `lib/`
+- [ ] `npm run dev` / `rspack:prod` после обновления vendor (приёмка PR клиента)
+
+### СББОЛ — исторически (git pin, 2026-05-29)
+
+- [x] Git pin `github:maullerz/react-redux-form#84f1669` (заменён на vendor для Jenkins)
+- [x] Ручной прогон UI на git pin — без замечаний
 
 ### Опционально / позже
 
 - [ ] `npm test` форка с react@16.14.x в devDependencies
 - [ ] `npm test` с React 17
 - [ ] Strict Mode spec для `Form` / `clearGetFormCacheForModel`
-- [ ] Сверка `utils/react-redux-form/*`, fix `Error.js` import из `src/`
+- [ ] Сверка `utils/react-redux-form/*` с публичным API форка
 - [ ] Формальный QA на трёх эталонных документах
 
 ---
@@ -120,8 +124,9 @@ HTML5 validation (`willValidate`) по-прежнему использует `th
 
 1. **Class components** — форк остаётся на class API; concurrent features React 18 в RRF не используются.
 2. **Legacy context** (`contextTypes` на `Form` / `resolve-model`) — предупреждения в Strict Mode; в СББОЛ Strict Mode на document routes — проверять отдельно.
-3. **Babel 6** — только сборка `lib/`; на runtime клиента не влияет.
-4. **`file:` локальная ссылка** на форк — риск вложенных `node_modules` и `core-js` в rspack; для команды использовать **только Git + prepare** ([08-client-install.md](./08-client-install.md)).
+3. **Babel 6** — `lib/` в ESM; `.babelrc` `env.test` с `modules: commonjs` для Mocha + `babel-register`.
+4. **Vendor в Git** — коммитить собранный `lib/`; CJS `lib/` ломает rspack dev (`exports is not defined`).
+5. **`file:` / git pin** — для Jenkins предпочтителен vendor ([08-client-install.md](./08-client-install.md)).
 
 ## Куда смотреть дальше
 
